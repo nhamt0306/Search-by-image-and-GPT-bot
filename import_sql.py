@@ -50,3 +50,25 @@ def extract_vector(model, image_path):
     vector = vector / np.linalg.norm(vector)
     return vector
 
+
+def extract_vector_static(model, image_path):
+    print("Xu ly : ", image_path)
+    img = Image.open(image_path)
+    img_tensor = image_preprocess(img)
+
+    # Trich dac trung
+    vector = model.predict(img_tensor)[0]
+    # Chuan hoa vector = chia chia L2 norm (tu google search)
+    vector = vector / np.linalg.norm(vector)
+    return vector
+
+def json_transform(cursor):
+    row_headers = [x[0] for x in cursor.description]
+    data = cursor.fetchall()
+
+    json_data = []
+
+    for result in data:
+        json_data.append(dict(zip(row_headers, result))) 
+    
+    return json_data
