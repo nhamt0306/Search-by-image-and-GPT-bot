@@ -74,6 +74,7 @@ if (os.path.isfile('products.pkl') == False or os.path.isfile('vectors.pkl') == 
 
 # @cross_origin(origin='*',headers=['Content-Type','Authorization'])
 @app.route('/search-by-image', methods=['POST'])
+@cross_origin(origin='*',headers=['Content-Type','Authorization'])
 def recommend():
     # Dinh nghia anh can tim kiem
     if 'files[]' not in request.files:
@@ -134,7 +135,12 @@ def recommend():
         # load data from database
         for id_product in img_result:
             mycursor = mydb.cursor()
-            mycursor.execute("SELECT * FROM clothing_store.products p WHERE p.id = "+ str(id_product))
+            mycursor.execute("select p.id, p.name, p.avg_rating, p.image, t.price, c.countComment " +
+                             "from products p, types t, (select count(*) as countComment " +
+                             "from comments c, products p " +
+                             "where c.product_id = p.id and p.id = " + str(id_product) + ") c " + 
+                             "where p.id = t.product_id and p.id = " + str(id_product) +
+                             " group by p.id")
             product_result += json_transform(mycursor)
             print(product_result)
 
