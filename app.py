@@ -2,7 +2,6 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS, cross_origin
 import mysql.connector
 from import_sql import *
-# from search_image import *
 from urllib.parse import quote
 from werkzeug.utils import secure_filename
 
@@ -92,7 +91,6 @@ def recommend():
             filename = secure_filename(file.filename)
             search_image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(search_image_path)
-            print(search_image)
             success = True
         else:
             errors[file.filename] = 'File type is not allowed'
@@ -137,7 +135,9 @@ def recommend():
         for id_product in img_result:
             mycursor = mydb.cursor()
             mycursor.execute("SELECT * FROM clothing_store.products p WHERE p.id = "+ str(id_product))
-            product_result.append(mycursor.fetchall())
+            product_result += json_transform(mycursor)
+            print(product_result)
+
             mycursor.close()
         
         return jsonify({'list': product_result})
